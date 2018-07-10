@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<plasterManifest
+  schemaVersion="1.0" xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1">
+  <metadata>
+    <name>MyCustomPlasterTemplate</name>
+    <id>343052d7-6422-41d0-9ba0-9b68b79be5b5</id>
+    <version>0.0.1</version>
+    <title>Travis' Custom Plaster Template</title>
+    <description></description>
+    <author>Travis Allen</author>
+    <tags></tags>
+  </metadata>
+  <parameters>
+    <parameter name="ModuleName" type="text" prompt="Name of your module" />
+    <parameter name="ModuleDesc" type="text" prompt="Brief description on this module" />
+    <parameter name="FunctionFolders" type="multichoice" prompt="Please select folders to include" default='0,1,2'>
+      <choice label="&amp;Public" help="Adds a public folder to module root" value="Public" />
+      <choice label="&amp;Private" help="Adds a Private folder to module root" value="Private" />
+      <choice label="&amp;Classes" help="Adds a classes folder to module root" value="Classes" />      
+    </parameter>
+    <parameter name="Pester" type="choice" prompt="Include Pester Tests?" default='0'>
+      <choice label="&amp;Yes" help="Adds a pester folder" value="Yes" />
+      <choice label="&amp;No" help="Does not add a pester folder" value="No" />
+    </parameter>
+    <parameter name="psake" type="choice" prompt="Include psake build automation?" default='0'>
+      <choice label="&amp;Yes" help="Adds default psake.ps1 and build.ps1 files" value="Yes" />
+      <choice label="&amp;No" help="Does not add psake file" value="No" />
+    </parameter>
+    <parameter name="DeployScript" type="choice" prompt="Include deploy script?" default='0'>
+      <choice label="&amp;Yes" help="Adds default deploy.ps1 file" value="Yes" />
+      <choice label="&amp;No" help="Does not add deploy.ps1 file" value="No" />
+    </parameter>
+  </parameters>
+  <content>
+    <newModuleManifest destination='${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psd1' 
+            moduleVersion='$PLASTER_PARAM_Version' 
+            rootModule='${PLASTER_PARAM_ModuleName}.psm1' 
+            author='$PLASTER_PARAM_FullName' 
+            description='$PLASTER_PARAM_ModuleDesc'/>
+    <file source='template.psm1' destination='${PLASTER_PARAM_ModuleName}\${PLASTER_PARAM_ModuleName}.psm1'/>
+    <message> Creating folders for module: $PLASTER_PARAM_ModuleName </message>
+    <file condition='$PLASTER_PARAM_FunctionFolders -contains "Public"' destination='${PLASTER_PARAM_ModuleName}\Public\' source='' />
+    <file condition='$PLASTER_PARAM_FunctionFolders -contains "Private"' destination='${PLASTER_PARAM_ModuleName}\Private\' source='' />
+    <file condition='$PLASTER_PARAM_FunctionFolders -contains "Classes"' destination='${PLASTER_PARAM_ModuleName}\Classes\' source='' />    
+    <message condition='$PLASTER_PARAM_Pester -eq "Yes"'>Creating a Tests folder </message>
+    <file condition='$PLASTER_PARAM_Pester -eq "Yes"' destination='Tests\' source='' />
+    <file condition='$PLASTER_PARAM_Pester -eq "Yes"' destination='Tests\${PLASTER_PARAM_ModuleName}.tests.ps1' source='basicTest.ps1' />
+    <message condition='$PLASTER_PARAM_psake -eq "Yes"'>Creating psake.ps1 and build.ps1 </message>
+    <file condition='$PLASTER_PARAM_psake -eq "Yes"' destination='psake.ps1' source='BasicPsake.ps1' />
+    <file condition='$PLASTER_PARAM_psake -eq "Yes"' destination='build.ps1' source='BasicBuild.ps1' />
+    <message condition='$PLASTER_PARAM_DeployScript -eq "Yes"'>Creating deploy.ps1 </message>
+    <file condition='$PLASTER_PARAM_DeployScript -eq "Yes"' destination='deploy.ps1' source='BasicDeploy.ps1' />
+  </content>
+</plasterManifest>
+
